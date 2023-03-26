@@ -20,4 +20,5 @@ Things to do:
 - Parameterize (MQTT URI at least)
 - Figure out how to properly sleep
 - Make into systemd service with proper logging
+- Link the cJSON repo rather than include the files
 
