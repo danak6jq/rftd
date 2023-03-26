@@ -5,6 +5,8 @@ Runs on ChirpStack server using MQTT to access uplinks from RAK10701 in "Mapper-
 
 Requires paho.mqtt.c
 
+Definitely a science-fair experiment at the moment.
+
 Getting started:
 
 - Install paho.mqtt.c on build/target system
