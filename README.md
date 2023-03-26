@@ -7,4 +7,5 @@ Getting started:
 
 - Install paho.mqtt.c on build/target system
 - Build rftd with 'sh make.sh'
+- Run rftd (currently with 'nohup rftd &'; make into systemd service)
 
