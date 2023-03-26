@@ -16,5 +16,6 @@ Getting started:
 
 Things to do:
 - Parameterize (MQTT URI at least)
+- Figure out how to properly sleep
 - Make into systemd service with proper logging
 
