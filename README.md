@@ -5,6 +5,6 @@ Requires paho.mqtt.c
 
 Getting started:
 
-Install paho.mqtt.c on build/target system
-Build rftd with 'sh make.sh'
+- Install paho.mqtt.c on build/target system
+- Build rftd with 'sh make.sh'
 
