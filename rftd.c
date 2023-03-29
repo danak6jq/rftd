@@ -32,7 +32,7 @@
 #include <pthread.h>
 #include <unistd.h>
 
-#define QOS         0
+#define QOS         1
 
 int disc_finished = 0;
 int subscribed = 0;
@@ -394,9 +394,11 @@ msgarrvd(void *context, char *topicName, int topicLen,
 		if ((rc =
 		     MQTTAsync_sendMessage(client, topic, &pubmsg,
 					   &opts)) != MQTTASYNC_SUCCESS) {
-			free(topic);
-			free(payload);
-			exit(EXIT_FAILURE);
+			printf("sendMessage Failure\n");
+			//free(topic);
+			//free(payload);
+			// XXX: no need to exit
+			// exit(EXIT_FAILURE);
 		}
 		free(topic);
 		free(payload);
@@ -407,16 +409,19 @@ msgarrvd(void *context, char *topicName, int topicLen,
 
 void onSubscribe(void *context, MQTTAsync_successData * response)
 {
+	printf("onSubscribe\n");
 	subscribed = 1;
 }
 
 void onSubscribeFailure(void *context, MQTTAsync_failureData * response)
 {
+	printf("onSubscribeFailure\n");
 	finished = 1;
 }
 
 void onConnectFailure(void *context, MQTTAsync_failureData * response)
 {
+	printf("onConnectFailure\n");
 	finished = 1;
 }
 
@@ -425,6 +430,8 @@ void onConnect(void *context, MQTTAsync_successData * response)
 	MQTTAsync client = (MQTTAsync) context;
 	MQTTAsync_responseOptions opts = MQTTAsync_responseOptions_initializer;
 	int rc;
+
+	printf("onConnect\n");
 
 	opts.onSuccess = onSubscribe;
 	opts.onFailure = onSubscribeFailure;
