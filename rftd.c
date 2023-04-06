@@ -28,6 +28,7 @@
 #include "MQTTAsync.h"
 #include "cJSON.h"
 #include <math.h>
+#include <time.h>
 
 #include <pthread.h>
 #include <unistd.h>
@@ -40,6 +41,17 @@ int finished = 0;
 
 void onConnect(void *context, MQTTAsync_successData * response);
 void onConnectFailure(void *context, MQTTAsync_failureData * response);
+
+void prTime()
+{
+  time_t rawtime;
+  struct tm * timeinfo;
+
+  time ( &rawtime );
+  timeinfo = localtime ( &rawtime );
+  printf ("%s: ", asctime (timeinfo) );
+}
+
 
 /*
  *
@@ -322,19 +334,27 @@ void connlost(void *context, char *cause)
 	conn_opts.cleansession = 1;
 	conn_opts.onSuccess = onConnect;
 	conn_opts.onFailure = onConnectFailure;
+	prTime();
+	printf("connlost: reconnect\n");
 	if ((rc = MQTTAsync_connect(client, &conn_opts)) != MQTTASYNC_SUCCESS) {
 		finished = 1;
+		prTime();
+		printf("connlost: reconnect FAILED\n");
 	}
 }
 
 void onDisconnectFailure(void *context, MQTTAsync_failureData * response)
 {
 	finished = 1;
+	prTime();
+	printf("connlost: disconnect FAILED\n");
 }
 
 void onDisconnect(void *context, MQTTAsync_successData * response)
 {
 	finished = 1;
+	prTime();
+	printf("connlost: disconnect\n");
 }
 
 void onSendFailure(void *context, MQTTAsync_failureData * response)
@@ -354,6 +374,7 @@ void onSendFailure(void *context, MQTTAsync_failureData * response)
 
 void onSend(void *context, MQTTAsync_successData * response)
 {
+//	printf("message sent: %p\n", response->alt.pub.message.payload);
 	// XXX: no action required
 }
 
@@ -394,11 +415,8 @@ msgarrvd(void *context, char *topicName, int topicLen,
 		if ((rc =
 		     MQTTAsync_sendMessage(client, topic, &pubmsg,
 					   &opts)) != MQTTASYNC_SUCCESS) {
+			prTime();
 			printf("sendMessage Failure\n");
-			//free(topic);
-			//free(payload);
-			// XXX: no need to exit
-			// exit(EXIT_FAILURE);
 		}
 		free(topic);
 		free(payload);
@@ -409,18 +427,21 @@ msgarrvd(void *context, char *topicName, int topicLen,
 
 void onSubscribe(void *context, MQTTAsync_successData * response)
 {
+	prTime();
 	printf("onSubscribe\n");
 	subscribed = 1;
 }
 
 void onSubscribeFailure(void *context, MQTTAsync_failureData * response)
 {
+	prTime();
 	printf("onSubscribeFailure\n");
 	finished = 1;
 }
 
 void onConnectFailure(void *context, MQTTAsync_failureData * response)
 {
+	prTime();
 	printf("onConnectFailure\n");
 	finished = 1;
 }
@@ -440,6 +461,8 @@ void onConnect(void *context, MQTTAsync_successData * response)
 	     MQTTAsync_subscribe(client, "application/+/device/+/event/up",
 				 QOS, &opts)) != MQTTASYNC_SUCCESS) {
 		finished = 1;
+		prTime();
+		printf("Subscribed FAILED\n");
 	}
 }
 
@@ -451,6 +474,8 @@ int main(int argc, char *argv[])
 	MQTTAsync_disconnectOptions disc_opts =
 	    MQTTAsync_disconnectOptions_initializer;
 	int rc, ch;
+
+	setbuf(stdout, NULL);
 
 	if ((rc =
 	     MQTTAsync_create(&client, "tcp://localhost:1883", "RAK-FT-Daemon",
@@ -481,7 +506,7 @@ int main(int argc, char *argv[])
 	}
 
 	while (!subscribed && !finished) {
-		usleep(10000L);
+		usleep(100000L);
 	}
 
 	if (finished) {
