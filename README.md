@@ -5,7 +5,7 @@ Runs on ChirpStack server using MQTT to access uplinks from RAK10701 in "Mapper-
 
 Requires paho.mqtt.c
 
-Definitely a science-fair experiment at the moment.
+A remarkably stable science-fair experiment in 24/7 use for over a month; no memory leakage noted and CPU usage is very low.
 
 Getting started:
 
